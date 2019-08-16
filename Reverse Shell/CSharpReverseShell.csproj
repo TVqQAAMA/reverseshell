@@ -7,7 +7,7 @@
     <ProjectGuid>{BBBD4AB5-F7CC-432D-B28F-AADE1975C075}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Reverse_Shell</RootNamespace>
-    <AssemblyName>Reverse Shell</AssemblyName>
+    <AssemblyName>Rev</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

